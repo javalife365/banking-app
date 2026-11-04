@@ -29,7 +29,7 @@ public class CustomerCredential {
     private String passwordHash;
 
     @Column(nullable = false)
-    private boolean enabled = true;
+    private boolean enabled;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
