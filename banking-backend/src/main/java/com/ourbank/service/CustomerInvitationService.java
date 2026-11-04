@@ -5,16 +5,13 @@ import com.ourbank.entity.Customer;
 import com.ourbank.entity.CustomerInvitation;
 import com.ourbank.repository.CustomerInvitationRepository;
 import com.ourbank.repository.CustomerRepository;
+import com.ourbank.util.InvitationTokenHasher;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.HexFormat;
 
 @RequiredArgsConstructor
 public class CustomerInvitationService {
@@ -42,7 +39,7 @@ public class CustomerInvitationService {
                 .encodeToString(randomBytes);
 
         //Hash the original token
-        String tokenHash = hashToken(originalToken);
+        String tokenHash = InvitationTokenHasher.hash(originalToken);
 
         //set expiration time
         LocalDateTime expiresAt = LocalDateTime.now().plusHours(EXPIRATION_HOURS);
@@ -56,16 +53,5 @@ public class CustomerInvitationService {
         return new InvitationTokenResponse(originalToken, expiresAt);
     }
 
-    private String hashToken(String originalToken) {
-
-        try{
-            MessageDigest digest = MessageDigest.getInstance("SHA_256");
-            byte[] hashBytes = digest.digest(originalToken.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(hashBytes);
-
-        } catch (NoSuchAlgorithmException ex){
-            throw new IllegalArgumentException("SHA-256 algorithm is unavailable", ex);
-        }
-    }
 
 }
